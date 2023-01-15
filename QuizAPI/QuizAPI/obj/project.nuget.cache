@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "rqj7ZiZ7OPSexR2TxazU6Po2sBdFtMOBKcTMSjavefQe6g4AFwCVv5zz5p19u6mlDV1XdbE8UsmTUrrNt8YU7Q==",
+  "success": true,
+  "projectFilePath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Veldon\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "C:\\Users\\Veldon\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\Veldon\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
+    "C:\\Users\\Veldon\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.2.3\\swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
+    "C:\\Users\\Veldon\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.2.3\\swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
+    "C:\\Users\\Veldon\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.2.3\\swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512"
+  ],
+  "logs": []
+}
