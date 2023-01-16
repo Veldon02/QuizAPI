@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuizAPI.Data;
 
@@ -11,9 +12,10 @@ using QuizAPI.Data;
 namespace QuizAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230116114200_CreateModelTables")]
+    partial class CreateModelTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,29 +157,6 @@ namespace QuizAPI.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("QuizAPI.Models.Answer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Answers");
-                });
-
             modelBuilder.Entity("QuizAPI.Models.Mark", b =>
                 {
                     b.Property<int>("Id")
@@ -202,30 +181,7 @@ namespace QuizAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Marks");
-                });
-
-            modelBuilder.Entity("QuizAPI.Models.Question", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
-
-                    b.ToTable("Questions");
+                    b.ToTable("Mark");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.QuestionAnswer", b =>
@@ -238,13 +194,7 @@ namespace QuizAPI.Migrations
 
                     b.HasKey("QuestionId", "AnswerId");
 
-                    b.HasIndex("AnswerId")
-                        .IsUnique();
-
-                    b.HasIndex("QuestionId")
-                        .IsUnique();
-
-                    b.ToTable("QuestionAnswers");
+                    b.ToTable("QuestionAnswer");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.Quiz", b =>
@@ -284,7 +234,7 @@ namespace QuizAPI.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quiz");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.RefreshToken", b =>
@@ -335,7 +285,7 @@ namespace QuizAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.User", b =>
@@ -462,13 +412,6 @@ namespace QuizAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("QuizAPI.Models.Answer", b =>
-                {
-                    b.HasOne("QuizAPI.Models.Question", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("QuestionId");
-                });
-
             modelBuilder.Entity("QuizAPI.Models.Mark", b =>
                 {
                     b.HasOne("QuizAPI.Models.Quiz", null)
@@ -480,32 +423,6 @@ namespace QuizAPI.Migrations
                     b.HasOne("QuizAPI.Models.User", null)
                         .WithMany("Marks")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("QuizAPI.Models.Question", b =>
-                {
-                    b.HasOne("QuizAPI.Models.Quiz", "Quiz")
-                        .WithMany("Questions")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-                });
-
-            modelBuilder.Entity("QuizAPI.Models.QuestionAnswer", b =>
-                {
-                    b.HasOne("QuizAPI.Models.Answer", null)
-                        .WithOne("questionAnswer")
-                        .HasForeignKey("QuizAPI.Models.QuestionAnswer", "AnswerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("QuizAPI.Models.Question", null)
-                        .WithOne("questionAnswer")
-                        .HasForeignKey("QuizAPI.Models.QuestionAnswer", "QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -540,25 +457,9 @@ namespace QuizAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("QuizAPI.Models.Answer", b =>
-                {
-                    b.Navigation("questionAnswer")
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("QuizAPI.Models.Question", b =>
-                {
-                    b.Navigation("Answers");
-
-                    b.Navigation("questionAnswer")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("QuizAPI.Models.Quiz", b =>
                 {
                     b.Navigation("Marks");
-
-                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.User", b =>

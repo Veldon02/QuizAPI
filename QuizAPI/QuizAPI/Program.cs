@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using QuizAPI.Data;
+using QuizAPI.Interfaces;
 using QuizAPI.Models;
+using QuizAPI.Repositories;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +54,9 @@ builder.Services.AddAuthentication(options =>
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = tokenValidationParameter;
     });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 
 var app = builder.Build();
 

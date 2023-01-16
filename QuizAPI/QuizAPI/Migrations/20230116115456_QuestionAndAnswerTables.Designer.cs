@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuizAPI.Data;
 
@@ -11,9 +12,10 @@ using QuizAPI.Data;
 namespace QuizAPI.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230116115456_QuestionAndAnswerTables")]
+    partial class QuestionAndAnswerTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,17 +215,12 @@ namespace QuizAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("QuizId");
 
                     b.ToTable("Questions");
                 });
@@ -484,17 +481,6 @@ namespace QuizAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("QuizAPI.Models.Question", b =>
-                {
-                    b.HasOne("QuizAPI.Models.Quiz", "Quiz")
-                        .WithMany("Questions")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-                });
-
             modelBuilder.Entity("QuizAPI.Models.QuestionAnswer", b =>
                 {
                     b.HasOne("QuizAPI.Models.Answer", null)
@@ -557,8 +543,6 @@ namespace QuizAPI.Migrations
             modelBuilder.Entity("QuizAPI.Models.Quiz", b =>
                 {
                     b.Navigation("Marks");
-
-                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("QuizAPI.Models.User", b =>
