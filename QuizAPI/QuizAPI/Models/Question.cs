@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QuizAPI.Models
 {
@@ -12,7 +13,6 @@ namespace QuizAPI.Models
         public IEnumerable<Answer> Answers { get; set; }
         [Required]
         public QuestionAnswer questionAnswer { get; set; }
-
-        public Quiz Quiz { get; set; }
+        public int QuizId { get; set; }
     }
 }

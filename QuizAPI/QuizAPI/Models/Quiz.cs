@@ -15,9 +15,9 @@ namespace QuizAPI.Models
         [Required]
         public byte Difficulty { get; set; }
         [Required]
-        public User Author { get; set; }
+        public string AuthorId { get; set; }
         [Required]
-        public Subject Subject { get; set; }
+        public int SubjectId { get; set; }
         [Required]
         public IEnumerable<Mark> Marks { get; set; }
         public IEnumerable<Question> Questions { get; set; }

@@ -10,5 +10,7 @@ namespace QuizAPI.Models
         public string Title { get; set; }
         [Required]
         public QuestionAnswer questionAnswer { get; set; }
+        [Required]
+        public int QuestionId { get; set; }
     }
 }

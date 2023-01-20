@@ -14,28 +14,6 @@ namespace QuizAPI.Repositories
             _context = context;
         }
 
-        public async Task<Answer> CreateAnswerAsync(Answer answer)
-        {
-            _context.Answers.Add(answer);
-            await _context.SaveChangesAsync();
-            return answer;
-        }
-
-        public async Task<Question> CreateQuastionAsync(Question question, int correctAnswer)
-        {
-            _context.Questions.Add(question);
-
-            var questionAnswer = new QuestionAnswer()
-            {
-                QuestionId = question.Id,
-                AnswerId = correctAnswer
-            };
-
-            _context.QuestionAnswers.Add(questionAnswer);
-            await _context.SaveChangesAsync();
-            return question;
-        }
-
         public async Task<Quiz> CreateQuizAsync(Quiz quiz)
         {
             _context.Quizzes.Add(quiz);
@@ -69,7 +47,23 @@ namespace QuizAPI.Repositories
 
         public async Task<IEnumerable<Quiz>> GetQuizzesAsync(QuerySpecification querySpecification)
         {
-            return await _context.Quizzes.ToListAsync();
+            IQueryable<Quiz> quizzes = _context.Quizzes;
+
+            quizzes = quizzes
+                .Skip((querySpecification.Page-1)*querySpecification.Size)
+                .Take(querySpecification.Size);
+
+            return await quizzes.ToListAsync();
+        }
+
+        public async Task<Subject> GetSubjectAsync(string subject)
+        {
+            return await _context.Subjects.FirstOrDefaultAsync(x => x.Name == subject);
+        }
+
+        public async Task<Subject> GetSubjectAsync(int id)
+        {
+            return await _context.Subjects.FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }
