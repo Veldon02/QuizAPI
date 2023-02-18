@@ -1,352 +1,169 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Application.Common.Interfaces.Persistence;
+using Application.Common.Specifications;
+using Application.Quizzes.Commands.AddQuestion;
+using Application.Quizzes.Commands.CreateMark;
+using Application.Quizzes.Commands.CreateQuiz;
+using Application.Quizzes.Commands.DeleteQuiz;
+using Application.Quizzes.Commands.RemoveQuestion;
+using Application.Quizzes.Commands.UpdateQuizInfo;
+using Application.Quizzes.Queries.GetPasserMark;
+using Application.Quizzes.Queries.GetQuiz;
+using Application.Quizzes.Queries.GetQuizQuestion;
+using Application.Quizzes.Queries.GetQuizzes;
+using Domain.Common.Errors;
+using Domain.MarkAggregate;
+using Domain.QuizAggregate;
+using Domain.QuizAggregate.Entities;
+using Domain.QuizAggregate.ValueObjects;
+using MapsterMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QuizAPI.Interfaces;
-using QuizAPI.Models;
-using QuizAPI.Models.Request;
-using QuizAPI.Models.Response;
+using OneOf;
+using Presentation.Api.Contracts.Quizzes;
+using System.Reflection.Metadata.Ecma335;
 
-namespace QuizAPI.Controllers
+namespace Presentation.Api.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    //[Authorize]
-    public class QuizController : ControllerBase
+    [Route("api/")]
+    public class QuizController : ApiController
     {
-        private readonly IQuizRepository _quizRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IMarkRepository _markRepository;
-        private readonly IQuestionRepository _questionRepository;
-
-        public QuizController(IQuizRepository quizRepository,
-            IUserRepository userRepository, 
-            IMarkRepository markRepository,
-            IQuestionRepository questionRepository)
+        private readonly IMapper _mapper;
+        private readonly ISender _madiator;
+        public QuizController(IMapper mapper, ISender madiator)
         {
-            _quizRepository = quizRepository;
-            _userRepository = userRepository;
-            _markRepository = markRepository;
-            _questionRepository = questionRepository;
+            _mapper = mapper;
+            _madiator = madiator;
         }
 
         #region GET
 
-        [HttpGet("quiz/{id}")]
-        public async Task<ActionResult<Quiz>> GetQuiz(int id)
-        {
-            var quiz = await _quizRepository.GetQuizAsync(id);
-            if (quiz == null) return NotFound();
-
-            var quizResponse = await CreateQuizResponseFromQuizAsync(quiz);
-
-            return Ok(quizResponse);
-        }
-
         [HttpGet("quizzes")]
-        public async Task<ActionResult<IEnumerable<QuizResponse>>> GetQuizzes([FromQuery] QuerySpecification querySpecification)
+        public async Task<ActionResult<List<QuizResponse>>> GetQuizzes([FromQuery] Specification specification)
         {
-            var quizzes = await _quizRepository.GetQuizzesAsync(querySpecification);
-
-            var quizResponses = new List<QuizResponse>();
-            foreach(var quiz in quizzes)
-            {
-                quizResponses.Add(await CreateQuizResponseFromQuizAsync(quiz));
-            }
-
-            return Ok(quizResponses);
+            var query = new GetQuizzesQuery(specification);
+            var result = await _madiator.Send(query);
+            return result.Match(
+                quizzes => Ok(_mapper.Map<List<QuizResponse>>(quizzes)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
         }
 
-        [HttpGet("question/{id}")]
-        public async Task<ActionResult<QuestionResponse>> GetQuestion(int id)
+        [HttpGet("quiz/{quizId}")]
+        public async Task<ActionResult<QuizResponse>> GetQuiz(string quizId)
         {
-            var question = await _questionRepository.GetQuestionAsync(id);
-            if (question == null) return NotFound();
-
-            var questionResponse = await CreateQuestionResponseFromQuestionAsync(question); 
-
-            return Ok(questionResponse);
+            var query = new GetQuizQuery(QuizId.Create(quizId));
+            var result = await _madiator.Send(query);
+            return result.Match(
+                quiz => Ok(_mapper.Map<QuizResponse>(quiz)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
         }
 
-        [HttpGet("mark/{email}/{quizId}")]
-        public async Task<ActionResult<IEnumerable<MarkResponse>>> GetMark(string email, int quizId)
+        [HttpGet("quiz/mark")]
+        public async Task<ActionResult<MarkResponse>> GetQuizMark([FromQuery] GetPasserMarkRequest request)
         {
-            var marks = await _markRepository.GetMarkAsync(quizId, email);
-
-            if (marks.Count() == 0) return NotFound();
-
-            var markResponses = new List<MarkResponse>();
-
-            foreach(var mark in marks)
-            {
-                var markResponse = await CreateMarkResponseFromMarkAsync(mark);
-                markResponses.Add(markResponse);
-            }
-
-            return markResponses;
+            var query = _mapper.Map<GetPasserMarkQuery>(request);
+            var result = await _madiator.Send(query);
+            return result.Match(
+                mark => Ok(_mapper.Map<MarkResponse>(mark)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
         }
 
-        [HttpGet("questionAnswer/{questionId}")]
-        public async Task<ActionResult<AnswerResponse>> GetQuestionAnswer(int questionId)
+        [HttpGet ("quiz/question")]
+        public async Task<ActionResult<Question>> GetQuizQuestion([FromQuery] GetQuizQuestionRequest request)
         {
-            var questionAnswer = await _questionRepository.GetQuestionAnswerAsync(questionId);
-            if (questionAnswer == null) return NotFound();
-
-            var answer = await _questionRepository.GetAnswerAsync(questionAnswer.AnswerId);
-
-            var answerresponse = new AnswerResponse()
-            {
-                Id = answer.Id,
-                Text = answer.Title
-            };
-            return answerresponse;
-        }
+            var query = _mapper.Map<GetQuizQuestionQuery>(request);
+            var result = await _madiator.Send(query);
+            return result.Match(
+                question => Ok(_mapper.Map<QuestionResponse>(question)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
+        }   
 
         #endregion
 
         #region POST
 
-        [HttpPost("quiz")]
-        public async Task<ActionResult<QuizResponse>> CreateQuiz([FromBody] QuizRequest quizRequest)
+        [HttpPost("authors/{authorId}/quiz")]
+        public async Task<ActionResult<Quiz>> PostQuiz(string authorId, CreateQuizRequest quizRequest)
         {
-            if (!ModelState.IsValid) return BadRequest("Provide all required fields");
+            var createQuizCommand = _mapper.Map<CreateQuizCommand>((quizRequest, authorId));
 
-            if (quizRequest.Difficulty > 10 && quizRequest.Difficulty <= 0) return BadRequest("Difficulty must be in [1,10]");
+            var result = await _madiator.Send(createQuizCommand);
 
-            var user = await _userRepository.GetUserByEmailAsync(quizRequest.AuthorEmail);
-            if (user == null) return BadRequest("Invalid author email");
-
-            var questionCount = quizRequest.Questions.Count();
-            if (questionCount == 0 || questionCount > byte.MaxValue) return BadRequest("Quiz must have at least 1 question");
-
-            var subject = await _quizRepository.GetSubjectAsync(quizRequest.Subject);
-            if (subject == null) return BadRequest("Invalid subject name");
-
-            var quizResponse = await CreateQuizFromRequestAsync(quizRequest);
-
-            return Ok(quizResponse);
+            return result.Match(
+                quiz => Ok(_mapper.Map<QuizResponse>(quiz)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
         }
 
-        [HttpPost("mark")]
-        public async Task<ActionResult<MarkResponse>> PostMark([FromBody] MarkRequest markRequest)
+        [HttpPost("quiz/mark")]
+        public async Task<ActionResult<Quiz>> PostMark(CreateMarkRequest request)
         {
-            if (!ModelState.IsValid) return BadRequest("Provide all required fields");
+            var command = _mapper.Map<CreateMarkCommand>(request);
 
-            var user = await _userRepository.GetUserByEmailAsync(markRequest.UserEmail);
-            if (user == null) return BadRequest("invalid user email");
+            var result = await _madiator.Send(command);
 
-            var quiz = await _quizRepository.GetQuizAsync(markRequest.QuizId);
-            if (markRequest.Mark > quiz.QuestionCount) return BadRequest("invalid mark");
+            return result.Match(
+                mark => Ok(_mapper.Map<MarkResponse>(mark)),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
+        }
 
-            var mark = new Mark()
-            {
-                QuizId = markRequest.QuizId,
-                UserId = user.Id,
-                QuizMark = markRequest.Mark
-            };
+        #endregion
 
-            mark = await _markRepository.CreateMarkAsync(mark);
+        #region PUT
 
-            var markResponse = new MarkResponse()
-            {
-                QuizId = mark.Id,
-                UserEmail = user.Email,
-                Mark = mark.QuizMark,
-                MaxMark = quiz.QuestionCount
-            };
+        [HttpPut("quiz/{quizId}")]
+        public async Task<ActionResult> PutQuiz(string quizId, UpdateQuizInfoRequest request)
+        {
+            var command = _mapper.Map<UpdateQuizInfoCommand>((quizId,request));
 
-            return markResponse;
+            var result = await _madiator.Send(command);
+
+            return result.Match(
+                _ => (dynamic)NoContent(),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
+        }
+
+        [HttpPut("quiz/{quizId}/add-question")]
+        public async Task<ActionResult> AddQuestion(string quizId, AddQuestionRequest request)
+        {
+            var command = _mapper.Map<AddQuestionCommand>((quizId,request));
+
+            var result = await _madiator.Send(command);
+
+            return result.Match(
+                _ => (dynamic)NoContent(),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
+        }
+
+        [HttpPut("quiz/{quizId}/question/{questionId:guid}/remove")]
+        public async Task<ActionResult> RemoveQuestion(string quizId, Guid questionId)
+        {
+            var command = _mapper.Map<RemoveQuestionCommand>((quizId, questionId));
+
+            var result = await _madiator.Send(command);
+
+            return result.Match(
+                _ => (dynamic)NoContent(),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
+        }
+
+        #endregion
+
+        #region DELETE
+
+        [HttpDelete("quiz/{quizId}")]
+        public async Task<ActionResult> DeleteQuiz(string quizId)
+        {
+            var command = new DeleteQuizCommand(QuizId.Create(quizId));
+            var result = await _madiator.Send(command);
+            return result.Match(
+                _ => (dynamic)NoContent(),
+                error => Problem(statusCode: (int)error.StatusCode, title: error.Title));
         }
 
         #endregion
 
 
-        #region Private methods
-        private async Task<QuizResponse> CreateQuizFromRequestAsync(QuizRequest quizRequest)
-        {
-            var user = await _userRepository.GetUserByEmailAsync(quizRequest.AuthorEmail);
-            var questionCount = quizRequest.Questions.Count();
-            var subject = await _quizRepository.GetSubjectAsync(quizRequest.Subject);
-
-            var quiz = new Quiz()
-            {
-                Name = quizRequest.Name,
-                Description = quizRequest.Description,
-                Difficulty = quizRequest.Difficulty,
-                AuthorId = user.Id,
-                SubjectId = subject.Id,
-                QuestionCount = (byte)questionCount
-            };
-
-            quiz =  await _quizRepository.CreateQuizAsync(quiz);
-
-            var quizResponse = new QuizResponse()
-            {
-                Id = quiz.Id,
-                Name = quiz.Name,
-                Description = quiz.Description,
-                QuestionCount = (byte)questionCount,
-                Difficulty = quiz.Difficulty,
-                Author = new UserResponse()
-                {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    UserName = user.UserName
-                },
-                Subject = subject.Name,
-            };
-
-            var questionResponses = new List<int>();
-
-            foreach(var questionRequest in quizRequest.Questions)
-            {
-                var questionResponse = await CreateQuestionFromRequestAsync(questionRequest, quiz);
-
-                questionResponses.Add(questionResponse.Id);
-            }
-
-            quizResponse.Questions = questionResponses;
-
-            return quizResponse;
-        }
-
-        private async Task<QuestionResponse> CreateQuestionFromRequestAsync(QuestionRequest questionRequest, Quiz quiz)
-        {
-            var question = new Question()
-            {
-                Title = questionRequest.Title,
-                QuizId = quiz.Id
-            };
-
-            question = await _questionRepository.CreateQuastionAsync(question);
-
-            var questionResponse = new QuestionResponse()
-            {
-                Id = question.Id,
-                Title = question.Title
-            };
 
 
-            var answerResponses = new List<AnswerResponse>();
-            foreach (var answerRequest in questionRequest.Answers)
-            {
-                var answerResponse = await CreateAnswerFromRequestAsync(answerRequest, question);
-
-                answerResponses.Add(answerResponse);
-            }
-
-            await _questionRepository.CreateQuastionAnswerAsync(question.Id, answerResponses[questionRequest.CorrectAnswer].Id);
-
-            questionResponse.Answers = answerResponses;
-            return questionResponse;
-        }
-
-        private async Task<AnswerResponse> CreateAnswerFromRequestAsync(AnswerRequest answerRequest, Question question)
-        {
-            var answer = new Answer()
-            {
-                Title = answerRequest.Text,
-                QuestionId = question.Id
-            };
-
-            answer = await _questionRepository.CreateAnswerAsync(answer);
-
-            var answerResponse = new AnswerResponse()
-            {
-                Id = answer.Id,
-                Text = answer.Title
-            };
-
-            return answerResponse;
-        }
-
-        private async Task<QuizResponse> CreateQuizResponseFromQuizAsync(Quiz quiz)
-        {
-            var author = await _userRepository.GetUserByIdAsync(quiz.AuthorId);
-            var subject = await _quizRepository.GetSubjectAsync(quiz.SubjectId);
-
-            var quizResponse = new QuizResponse()
-            {
-                Id = quiz.Id,
-                Name = quiz.Name,
-                Description = quiz.Description,
-                Author = new UserResponse()
-                {
-                    FirstName = author.FirstName,
-                    LastName = author.LastName,
-                    Email = author.Email,
-                    UserName = author.UserName
-                },
-                Difficulty = quiz.Difficulty,
-                Subject = subject.Name,
-                QuestionCount = quiz.QuestionCount,
-            };
-
-            var questionReponses = new List<int>();
-
-            var questions = await _questionRepository.GetQuestionsAsync(quiz.Id);
-
-            foreach (var question in questions)
-            {
-                var questionResponse = await CreateQuestionResponseFromQuestionAsync(question);
-                questionReponses.Add(questionResponse.Id);
-            }
-
-            quizResponse.Questions = questionReponses;
-
-            return quizResponse;
-        }
-
-        private async Task<QuestionResponse> CreateQuestionResponseFromQuestionAsync(Question question)
-        {
-            var questionResponse = new QuestionResponse()
-            {
-                Id = question.Id,
-                Title = question.Title
-            };
-
-            var answerResponses = new List<AnswerResponse>();
-
-            var answers = await _questionRepository.GetAnswersAsync(question.Id);
-
-            foreach(var answer in answers)
-            {
-                var answerresponse = CreateAnswerResponseFromAnswer(answer);
-                answerResponses.Add(answerresponse);
-            }
-
-            questionResponse.Answers = answerResponses;
-
-            return questionResponse;
-        }
-
-        private AnswerResponse CreateAnswerResponseFromAnswer(Answer answer)
-        {
-            var answerResponse = new AnswerResponse()
-            {
-                Id = answer.Id,
-                Text = answer.Title
-            };
-
-            return answerResponse;
-        }
-
-        private async Task<MarkResponse> CreateMarkResponseFromMarkAsync(Mark mark)
-        {
-            var user = await _userRepository.GetUserByIdAsync(mark.UserId);
-            var quiz = await _quizRepository.GetQuizAsync(mark.QuizId);
-
-            var markResponse = new MarkResponse()
-            {
-                QuizId = mark.QuizId,
-                UserEmail = user.Email,
-                Mark = mark.QuizMark,
-                MaxMark = quiz.QuestionCount
-            };
-
-            return markResponse;
-        }
-
-        #endregion
     }
 }

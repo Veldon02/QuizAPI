@@ -4,14 +4,73 @@
     "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj": {}
   },
   "projects": {
-    "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj": {
+    "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
-        "projectName": "QuizAPI",
-        "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
+        "projectUniqueName": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj",
+        "projectName": "Application",
+        "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj",
         "packagesPath": "C:\\Users\\Veldon\\.nuget\\packages\\",
-        "outputPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\obj\\",
+        "outputPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Veldon\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\Domain.csproj": {
+                "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\Domain.csproj",
+        "projectName": "Domain",
+        "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\Veldon\\.nuget\\packages\\",
+        "outputPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Veldon\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -39,7 +98,152 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\Infrastructure.csproj",
+        "projectName": "Infrastructure",
+        "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Veldon\\.nuget\\packages\\",
+        "outputPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Veldon\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj": {
+                "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
+        "projectName": "QuizAPI",
+        "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI.csproj",
+        "packagesPath": "C:\\Users\\Veldon\\.nuget\\packages\\",
+        "outputPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\QuizAPI\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Veldon\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj": {
+                "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Application\\Application.csproj"
+              },
+              "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "D:\\ASP.NET_Projects\\QuizAPI\\QuizAPI\\QuizAPI\\Infrastructure\\Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[11.4.0, )"
+            },
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.2.2, )"
+            },
+            "Mapster": {
+              "target": "Package",
+              "version": "[7.3.0, )"
+            },
+            "Mapster.DependencyInjection": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            },
+            "MediatR": {
+              "target": "Package",
+              "version": "[11.1.0, )"
+            },
+            "MediatR.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[11.0.0, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.13, )"
@@ -67,6 +271,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[6.0.13, )"
+            },
+            "OneOf": {
+              "target": "Package",
+              "version": "[3.0.223, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
